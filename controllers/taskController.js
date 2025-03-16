@@ -1,3 +1,4 @@
+import * as api from '../models/Api.js';
 const Task = require('../models/Task');
 
 exports.getTasks = async (req, res) => {
@@ -44,4 +45,43 @@ exports.deleteTask = async (req, res) => {
   } catch (error) {
     res.status(500).json({ message: 'Error deleting task', error });
   }
+
+};
+
+export const handleLogin = async (username, password, router) => {
+  try {
+    const res = await api.login(username, password);
+    localStorage.setItem('token', res.data.token);
+    router.push('/tasks');
+  } catch (error) {
+    throw new Error('Login failed');
+  }
+};
+
+export const handleRegister = async (username, password, router) => {
+  try {
+    await api.register(username, password);
+    router.push('/');
+  } catch (error) {
+    throw new Error('Registration failed');
+  }
+};
+
+export const fetchTasks = async (token) => {
+  const res = await api.getTasks(token);
+  return res.data;
+};
+
+export const handleCreateTask = async (task, token) => {
+  const res = await api.createTask(task, token);
+  return res.data;
+};
+
+export const handleUpdateTask = async (id, task, token) => {
+  const res = await api.updateTask(id, task, token);
+  return res.data;
+};
+
+export const handleDeleteTask = async (id, token) => {
+  await api.deleteTask(id, token);
 };
